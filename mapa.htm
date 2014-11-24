@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>Mapa</title>
+  <script type="text/javascript" src="zepto.min.js"></script>
+  <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+  <script type="text/javascript" src="touch.js"></script>
+  <script type="text/javascript" src="gmaps.js"></script>
+  
+  <link rel="stylesheet" type="text/css" href="geo.css">
+
+  <script type="text/javascript">
+    var map, mlat=0, mlng=0,arrcoordini={}, arrcoordfin={};
+
+    $(function(){
+        // if (localStorage.fincoords !== undefined )  //si ya había una ruta trazada al momento de que se cerró la aplicación
+        // {
+        //     arrcoordini = JSON.parse(localStorage.inicoords); //leemos los datos almacenados
+        //     arrcoordfin = JSON.parse(localStorage.fincoords);
+
+            // GMaps.geolocate({   //que nos geolocalice
+            //   success:function(position)
+            //   {
+            //     arrcoordini.lat = position.coords.latitude;
+            //     arrcoordini.lng = position.coords.longitude;
+
+            //     map = new GMaps({  //dibuje mapa de nuestra localizacion
+            //         el:'#map',
+            //         lat:arrcoordini.lat,
+            //         lng:arrcoordini.lng,
+            //         click:enlazarMarcador,
+            //         tap:enlazarMarcador
+            //     });
+            //     map.addMarker({
+            //         lat:arrcoordini.lat,
+            //         lng:arrcoordini.lng,
+            //         title:'Origen'
+            //     });
+            //     map.drawRoute({
+            //         origin:[arrcoordini.lat,arrcoordini.lng],
+            //         destination:[arrcoordfin.lat,arrcoordfin.lng],
+            //         travelMode:'driving',
+            //          strokeColor:'#436587',
+            //          strokeOpacity:0.6,
+            //          strokeWeight:4
+            //     });
+            //     map.addMarker({
+            //         lat:arrcoordfin.lat,
+            //         lng:arrcoordfin.lng,
+            //         title:'Destino'
+            //     });   
+            //   },
+            //   error: function(error) { alert('Geolocalización falla: '+error.message); },
+            //   not_supported: function(){ alert("Su navegador no soporta geolocalización"); },
+            // });
+        // }
+        // else  //si no habia ruta guardada en localstorage
+        // {
+            inicializar();
+        //}
+        
+      function enlazarMarcador(e)
+      {
+        if (arrcoordfin.lat !== undefined){  //Se comprueba si el evento viene despues de un reinicio o en la carga inicial
+            mlat = arrcoordfin.lat;
+            mlng = arrcoordfin.lng;
+        }else{
+            mlat = arrcoordini.lat;
+            mlng = arrcoordini.lng;
+        }
+
+        // muestra ruta entre marcas anteriores y actuales
+        map.drawRoute({
+            origin: [mlat, mlng],  // origen en coordenadas anteriores
+            destination: [e.latLng.lat(), e.latLng.lng()],  // destino en coordenadas del click o toque actual
+            travelMode: 'driving',
+            strokeColor: '#436587',
+            strokeOpacity: 0.6,
+            strokeWeight: 4
+          });
+
+        lat = e.latLng.lat();   // guarda coords para marca siguiente
+        lng = e.latLng.lng();  
+        
+        map.addMarker({ lat: lat, lng: lng});  // pone marcador en mapa
+        
+        arrcoordfin = {lat:lat,lng:lng};   //almacena las coordenadas en el array
+        localStorage.fincoords = JSON.stringify(arrcoordfin);  // y en la variable localStorage serializada
+      };
+
+      function inicializar()  //si hay geolocalizacion, guarda lat y lng, dibuja el mapa, pone la chicheta y lo guarda en localstorage
+      {
+        GMaps.geolocate({
+            success:function(position)
+            {
+              arrcoordini.lat = position.coords.latitude;
+              arrcoordini.lng = position.coords.longitude;
+
+              map = new GMaps({
+                  el:'#map',
+                  lat:arrcoordini.lat,
+                  lng:arrcoordini.lng,
+                  click:enlazarMarcador,
+                  tap:enlazarMarcador
+              });
+              map.addMarker({
+                  lat:arrcoordini.lat,
+                  lng:arrcoordini.lng,
+                  title:'Origen'
+              });
+              //localStorage.inicoords = JSON.stringify(arrcoordini);
+            },
+            error: function(error) { alert('Geolocalización falla: '+error.message); },
+            not_supported: function(){ alert("Su navegador no soporta geolocalización"); },
+          });
+
+          arrcoordfin = {}; //se inicializa el array que almacena las coordenadas finales
+          //localStorage.fincoords = 'null'; //se limpia las coordenadas finales del almacenamiento local
+      }
+
+      function compactar()   //dibuja mapa, pone chicheta de inicio, dibuja ruta, pone chicheta de fin
+      {  
+        map = new GMaps({
+            el:'#map',
+            lat:arrcoordini.lat,
+            lng:arrcoordini.lng,
+            click:enlazarMarcador,
+            tap:enlazarMarcador
+        });
+        map.addMarker({
+            lat:arrcoordini.lat,
+            lng:arrcoordini.lng,
+            title:'Origen'
+
+        });
+        map.drawRoute({
+            origin:[arrcoordini.lat,arrcoordini.lng],
+            destination:[arrcoordfin.lat,arrcoordfin.lng],
+            travelMode:'driving',
+            strokeColor:'#436587',
+            strokeOpacity:0.6,
+            strokeWeight:4
+        });
+        map.addMarker({
+            lat:arrcoordfin.lat,
+            lng:arrcoordfin.lng,
+            title:'Destino'
+        });
+      } 
+        
+        $("#reiniciar").on('click', inicializar);
+        $("#reiniciar").on('tap', inicializar);
+        $("#compactar").on('click',compactar);
+        $("#compactar").on('tap',compactar);
+    });
+  </script>
+</head>
+<body>
+
+  <section class="center">
+      <div id="logo"><img src="logo.jpg" width="150"></div>
+      <h1 class="center">Ejemplo de uso de Gmaps.js</h1>
+
+      <button type="button" id="reiniciar">Reiniciar</button>
+      <button type="button" id="compactar">Compactar</button>
+
+      <div id="map"></div>
+
+      <div id="pie" class="center">Sergio Alegre - <a href="https://twitter.com/naarean">@naarean</a> - <a href="https://github.com/naarean">github.com/naarean</a></div>
+    </section>
+</body>
+</html>

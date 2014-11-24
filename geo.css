@@ -1,0 +1,31 @@
+body {
+	background: none repeat scroll 0 0 #f1f1f1;
+    height: 100%;
+    width: 100%;
+}
+
+section {
+	max-width: 600px;
+	margin: auto;
+	background-color: #fff;
+    padding: 10px;
+}
+
+section h1 {
+	font-size: 1.8em;
+    color: #666;
+}
+
+#map{
+	margin: 10px;
+  	min-height: 400px;
+  	background: rgba(100,200,000,0.5); /* verde si no hay mapa */
+}
+
+.center{
+	text-align: center;
+}
+
+#pie{
+	position: relative;
+}
