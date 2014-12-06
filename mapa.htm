@@ -11,54 +11,56 @@
   <link rel="stylesheet" type="text/css" href="geo.css">
 
   <script type="text/javascript">
+
     var map, mlat=0, mlng=0,arrcoordini={}, arrcoordfin={};
 
     $(function(){
-        // if (localStorage.fincoords !== undefined )  //si ya había una ruta trazada al momento de que se cerró la aplicación
-        // {
-        //     arrcoordini = JSON.parse(localStorage.inicoords); //leemos los datos almacenados
-        //     arrcoordfin = JSON.parse(localStorage.fincoords);
 
-            // GMaps.geolocate({   //que nos geolocalice
-            //   success:function(position)
-            //   {
-            //     arrcoordini.lat = position.coords.latitude;
-            //     arrcoordini.lng = position.coords.longitude;
+      if (localStorage.fincoords !== undefined )  //si había una ruta almacenada en localstorage la leemos
+      {
+          arrcoordini = JSON.parse(localStorage.getItem('inicoords'));
+          arrcoordfin = JSON.parse(localStorage.getItem('fincoords'));
 
-            //     map = new GMaps({  //dibuje mapa de nuestra localizacion
-            //         el:'#map',
-            //         lat:arrcoordini.lat,
-            //         lng:arrcoordini.lng,
-            //         click:enlazarMarcador,
-            //         tap:enlazarMarcador
-            //     });
-            //     map.addMarker({
-            //         lat:arrcoordini.lat,
-            //         lng:arrcoordini.lng,
-            //         title:'Origen'
-            //     });
-            //     map.drawRoute({
-            //         origin:[arrcoordini.lat,arrcoordini.lng],
-            //         destination:[arrcoordfin.lat,arrcoordfin.lng],
-            //         travelMode:'driving',
-            //          strokeColor:'#436587',
-            //          strokeOpacity:0.6,
-            //          strokeWeight:4
-            //     });
-            //     map.addMarker({
-            //         lat:arrcoordfin.lat,
-            //         lng:arrcoordfin.lng,
-            //         title:'Destino'
-            //     });   
-            //   },
-            //   error: function(error) { alert('Geolocalización falla: '+error.message); },
-            //   not_supported: function(){ alert("Su navegador no soporta geolocalización"); },
-            // });
-        // }
-        // else  //si no habia ruta guardada en localstorage
-        // {
-            inicializar();
-        //}
+          GMaps.geolocate({   //que nos geolocalice
+            success:function(position)
+            {
+              arrcoordini.lat = position.coords.latitude;
+              arrcoordini.lng = position.coords.longitude;
+
+              map = new GMaps({  //dibuje mapa de nuestra localizacion
+                  el:'#map',
+                  lat:arrcoordini.lat,
+                  lng:arrcoordini.lng,
+                  click:enlazarMarcador,
+                  tap:enlazarMarcador
+              });
+              map.addMarker({
+                  lat:arrcoordini.lat,
+                  lng:arrcoordini.lng,
+                  title:'Origen'
+              });
+              map.drawRoute({
+                  origin:[arrcoordini.lat,arrcoordini.lng],
+                  destination:[arrcoordfin.lat,arrcoordfin.lng],
+                  travelMode:'driving',
+                  strokeColor:'#436587',
+                  strokeOpacity:0.6,
+                  strokeWeight:4
+              });
+              map.addMarker({
+                  lat:arrcoordfin.lat,
+                  lng:arrcoordfin.lng,
+                  title:'Destino'
+              });   
+            },
+            error: function(error) { alert('Geolocalización falla: '+error.message); },
+            not_supported: function(){ alert("Su navegador no soporta geolocalización"); },
+          });
+      }
+      else  //si no habia ruta guardada en localstorage, es la primera vez que arrancamos
+      {
+          inicializar();
+      }
         
       function enlazarMarcador(e)
       {
@@ -109,14 +111,14 @@
                   lng:arrcoordini.lng,
                   title:'Origen'
               });
-              //localStorage.inicoords = JSON.stringify(arrcoordini);
+              localStorage.inicoords = JSON.stringify(arrcoordini);  //nos guardamos las coordenadas de inicio en localstorage
             },
             error: function(error) { alert('Geolocalización falla: '+error.message); },
             not_supported: function(){ alert("Su navegador no soporta geolocalización"); },
           });
 
           arrcoordfin = {}; //se inicializa el array que almacena las coordenadas finales
-          //localStorage.fincoords = 'null'; //se limpia las coordenadas finales del almacenamiento local
+          localStorage.fincoords = null; //se limpia las coordenadas finales del almacenamiento local
       }
 
       function compactar()   //dibuja mapa, pone chicheta de inicio, dibuja ruta, pone chicheta de fin
