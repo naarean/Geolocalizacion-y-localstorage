@@ -64,10 +64,9 @@ LinkedIn: https://www.linkedin.com/in/sergioalegre
 
 ### Built With
 <!-- TECNOLOGIAS -->
-* [PHP](PHP)
-* [AJAX](AJAX)
-* [JQUERY](JQUERY)
-* [MYSQL](MYSQL)
+* [HTML5](HTML5)
+* [localstorage](localstorage)
+* [geolocalizacion](geolocalizacion)
 
 
 <!-- GETTING STARTED -->
